@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { IntegrationSetupBanner } from '../ui/IntegrationSetupBanner';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
+import { RoleForgeLogo } from '../ui/RoleForgeLogo';
 import {
   Layers,
   LayoutDashboard,
@@ -70,13 +71,8 @@ export const DashboardLayout: React.FC = () => {
         <aside className="hidden lg:flex flex-col w-64 border-r border-slate-200/80 bg-white shadow-soft">
           {/* Brand header */}
           <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-            <Link to="/dashboard" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-sm">
-                <Layers className="w-5 h-5" />
-              </div>
-              <span className="text-lg font-bold tracking-tight text-slate-900 font-display">
-                Role<span className="text-indigo-600">Forge</span>
-              </span>
+            <Link to="/dashboard" className="group">
+              <RoleForgeLogo size="md" showWordmark={true} />
             </Link>
           </div>
 
@@ -129,10 +125,7 @@ export const DashboardLayout: React.FC = () => {
         {/* Mobile Header & Drawer */}
         <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
           <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
-              <Layers className="w-4 h-4" />
-            </div>
-            <span className="font-bold text-slate-900 font-display">RoleForge</span>
+            <RoleForgeLogo size="sm" showWordmark={true} />
           </Link>
           <button
             onClick={() => setMobileNavOpen(!mobileNavOpen)}

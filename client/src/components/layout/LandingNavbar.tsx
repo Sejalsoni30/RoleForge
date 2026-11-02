@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/Button';
-import { Layers, Menu, X, ArrowRight } from 'lucide-react';
+import { RoleForgeLogo } from '../ui/RoleForgeLogo';
+import { Menu, X, ArrowRight } from 'lucide-react';
 
 export const LandingNavbar: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -24,18 +25,8 @@ export const LandingNavbar: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Brand Logo */}
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-700 via-indigo-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-            <Layers className="w-5 h-5" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xl font-bold tracking-tight text-slate-900 font-display">
-              Role<span className="text-indigo-600">Forge</span>
-            </span>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 -mt-1">
-              Resume-to-Job Compiler
-            </span>
-          </div>
+        <Link to="/" className="group">
+          <RoleForgeLogo size="lg" showSubtitle={true} />
         </Link>
 
         {/* Desktop Links */}

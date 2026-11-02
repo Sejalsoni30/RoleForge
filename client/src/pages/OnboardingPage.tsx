@@ -5,7 +5,8 @@ import { useToast } from '../contexts/ToastContext';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Layers, Briefcase, Target, ShieldCheck, ArrowRight, Check } from 'lucide-react';
+import { RoleForgeLogo } from '../components/ui/RoleForgeLogo';
+import { Briefcase, Target, ShieldCheck, ArrowRight, Check } from 'lucide-react';
 
 export const OnboardingPage: React.FC = () => {
   const { user, updateProfile } = useAuth();
@@ -47,11 +48,8 @@ export const OnboardingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-surface-canvas flex flex-col justify-center py-12 sm:px-6 lg:px-8 hero-mesh-gradient">
       <div className="sm:mx-auto sm:w-full sm:max-w-lg text-center mb-6">
-        <div className="inline-flex items-center gap-2 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white">
-            <Layers className="w-5 h-5" />
-          </div>
-          <span className="text-2xl font-bold text-slate-900 font-display">RoleForge</span>
+        <div className="inline-flex justify-center mb-4">
+          <RoleForgeLogo size="lg" showSubtitle={true} />
         </div>
         <h2 className="text-2xl font-bold text-slate-900 font-display">
           Personalize Your Compilation Workspace

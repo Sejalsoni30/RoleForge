@@ -26,3 +26,4 @@ export const signInWithGoogle = async () => {
   const result = await signInWithPopup(auth, googleProvider);
   return result.user;
 };
+

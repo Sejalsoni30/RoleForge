@@ -5,7 +5,8 @@ import { useToast } from '../contexts/ToastContext';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Layers, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { RoleForgeLogo } from '../components/ui/RoleForgeLogo';
+import { Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export const ForgotPasswordPage: React.FC = () => {
   const { success, error } = useToast();
@@ -36,11 +37,8 @@ export const ForgotPasswordPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-surface-canvas flex flex-col justify-center py-12 sm:px-6 lg:px-8 hero-mesh-gradient">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link to="/" className="inline-flex items-center gap-2 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white">
-            <Layers className="w-5 h-5" />
-          </div>
-          <span className="text-2xl font-bold text-slate-900 font-display">RoleForge</span>
+        <Link to="/" className="inline-flex justify-center mb-6">
+          <RoleForgeLogo size="lg" showSubtitle={true} />
         </Link>
         <h2 className="text-2xl font-bold text-slate-900 font-display">Reset your password</h2>
         <p className="mt-2 text-sm text-slate-600">

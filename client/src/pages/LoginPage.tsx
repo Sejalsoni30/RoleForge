@@ -5,8 +5,9 @@ import { useToast } from '../contexts/ToastContext';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { RoleForgeLogo } from '../components/ui/RoleForgeLogo';
 import { signInWithGoogle, isFirebaseConfigured } from '../config/firebase';
-import { Layers, Mail, Lock, ArrowRight, Info } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Info } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const { login, loginWithGoogle } = useAuth();
@@ -74,13 +75,8 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-surface-canvas flex flex-col justify-center py-12 sm:px-6 lg:px-8 hero-mesh-gradient">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link to="/" className="inline-flex items-center gap-2.5 mb-6 group">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
-            <Layers className="w-5 h-5" />
-          </div>
-          <span className="text-2xl font-bold tracking-tight text-slate-900 font-display">
-            Role<span className="text-indigo-600">Forge</span>
-          </span>
+        <Link to="/" className="inline-flex justify-center mb-6 group">
+          <RoleForgeLogo size="lg" showSubtitle={true} />
         </Link>
         <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight font-display">
           Sign in to your account
