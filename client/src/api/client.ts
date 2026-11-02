@@ -6,7 +6,14 @@ export interface ApiResponse<T = any> {
   devResetToken?: string;
 }
 
-const BASE_URL = '/api';
+const getBaseUrl = (): string => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl) return '/api';
+  const clean = envUrl.replace(/\/+$/, '');
+  return clean.endsWith('/api') ? clean : `${clean}/api`;
+};
+
+const BASE_URL = getBaseUrl();
 
 class ApiClient {
   private getToken(): string | null {

@@ -55,7 +55,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/api', apiLimiter);
 
 // Health check endpoint
-app.get('/health', (_req, res) => {
+app.get(['/health', '/api/health'], (_req, res) => {
   res.status(200).json({ status: 'ok', service: 'RoleForge Server', uptime: process.uptime() });
 });
 

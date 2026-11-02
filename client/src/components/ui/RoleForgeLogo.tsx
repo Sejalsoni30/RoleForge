@@ -95,3 +95,4 @@ export const RoleForgeLogo: React.FC<RoleForgeLogoProps> = ({
     </div>
   );
 };
+
