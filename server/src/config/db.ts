@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
 import { ENV } from './env';
 
 let isConnected = false;
@@ -10,7 +11,25 @@ export const connectDB = async (): Promise<void> => {
 
   try {
     if (ENV.MONGODB_URI) {
-      await mongoose.connect(ENV.MONGODB_URI);
+      try {
+        await mongoose.connect(ENV.MONGODB_URI);
+      } catch (connErr: any) {
+        if (
+          connErr?.message?.includes('querySrv') ||
+          connErr?.message?.includes('ECONNREFUSED') ||
+          connErr?.code === 'ECONNREFUSED'
+        ) {
+          console.log('[Database] DNS SRV lookup failed, retrying with public DNS resolvers...');
+          try {
+            dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+            await mongoose.connect(ENV.MONGODB_URI);
+          } catch (retryErr) {
+            throw retryErr;
+          }
+        } else {
+          throw connErr;
+        }
+      }
       isConnected = true;
       dbProvider = ENV.MONGODB_URI.includes('mongodb+srv') ? 'atlas-mongodb' : 'local-mongodb';
       console.log(`[Database] Connected successfully to MongoDB (${dbProvider})`);
