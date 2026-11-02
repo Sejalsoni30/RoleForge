@@ -5,10 +5,11 @@ import { useToast } from '../contexts/ToastContext';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { signInWithGoogle, isFirebaseConfigured } from '../config/firebase';
 import { Layers, Mail, Lock, ArrowRight, Info } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const { success, error } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,7 +17,39 @@ export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [googleOauthNote, setGoogleOauthNote] = useState(false);
+
+  const handleGoogleSignIn = async () => {
+    if (!isFirebaseConfigured()) {
+      setGoogleOauthNote(true);
+      return;
+    }
+
+    setIsGoogleLoading(true);
+    try {
+      const fbUser = await signInWithGoogle();
+      if (!fbUser.email) {
+        throw new Error('Google did not return an email address.');
+      }
+      await loginWithGoogle({
+        email: fbUser.email,
+        name: fbUser.displayName || 'Google User',
+        avatar: fbUser.photoURL || undefined,
+        googleId: fbUser.uid,
+      });
+      success('Welcome to RoleForge!');
+      const from = (location.state as any)?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
+    } catch (err: any) {
+      if (err.code === 'auth/popup-closed-by-user') {
+        return;
+      }
+      error(err.message || 'Google sign-in failed.');
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,7 +154,8 @@ export const LoginPage: React.FC = () => {
               <Button
                 variant="outline"
                 className="w-full text-slate-700 hover:bg-slate-50"
-                onClick={() => setGoogleOauthNote(!googleOauthNote)}
+                onClick={handleGoogleSignIn}
+                isLoading={isGoogleLoading}
               >
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                   <path

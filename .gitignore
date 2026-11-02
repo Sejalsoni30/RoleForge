@@ -5,7 +5,8 @@ server/dist/
 shared/dist/
 temp_uploads/
 .env
-.env.local
+.env.*
+!.env.example
 *.log
 .DS_Store
 npm-debug.log*
