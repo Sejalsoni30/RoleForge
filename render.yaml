@@ -3,11 +3,13 @@ services:
     name: roleforge-server
     env: node
     plan: starter
-    buildCommand: npm install && npm run build --workspace=@roleforge/shared && npm run build --workspace=@roleforge/server
-    startCommand: npm run start --workspace=@roleforge/server
+    buildCommand: npm install --include=dev && npm run build:server
+    startCommand: npm run start -w server
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NODE_VERSION
+        value: 20.18.0
       - key: PORT
         value: 5000
       - key: JWT_SECRET
@@ -20,4 +22,3 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
-
