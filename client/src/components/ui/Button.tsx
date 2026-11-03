@@ -55,12 +55,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin text-current" />
+          <Loader2 className="w-4 h-4 animate-spin text-current shrink-0" />
         ) : (
-          leftIcon
+          leftIcon && <span className="inline-flex shrink-0 items-center justify-center">{leftIcon}</span>
         )}
-        <span>{children}</span>
-        {!isLoading && rightIcon}
+        <span className="inline-flex items-center justify-center gap-2">{children}</span>
+        {!isLoading && rightIcon && (
+          <span className="inline-flex shrink-0 items-center justify-center">{rightIcon}</span>
+        )}
       </button>
     );
   }
