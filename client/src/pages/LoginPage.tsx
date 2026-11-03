@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { api } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { Input } from '../components/ui/Input';
@@ -56,6 +57,11 @@ export const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [googleOauthNote, setGoogleOauthNote] = useState(false);
+
+  // Pre-warm the backend server on mount (eliminates Render free tier cold-start delay)
+  useEffect(() => {
+    api.get('/health').catch(() => {});
+  }, []);
 
   const handleGoogleSignIn = async () => {
     if (!isFirebaseConfigured()) {
@@ -270,9 +276,9 @@ export const LoginPage: React.FC = () => {
                   type="submit"
                   className="w-full h-11 mt-2 text-sm font-semibold rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-md shadow-indigo-500/25 transition-all duration-150"
                   isLoading={isLoading}
-                  rightIcon={<ArrowRight className="w-4 h-4 ml-1" />}
+                  rightIcon={!isLoading ? <ArrowRight className="w-4 h-4 ml-1" /> : undefined}
                 >
-                  Sign In to RoleForge
+                  {isLoading ? 'Signing in...' : 'Sign In to RoleForge'}
                 </Button>
               </form>
 

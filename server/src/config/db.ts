@@ -6,13 +6,20 @@ let isConnected = false;
 let dbProvider: 'local-mongodb' | 'atlas-mongodb' | 'memory-mongodb' = 'local-mongodb';
 let memoryServerInstance: any = null;
 
+const mongooseOptions: mongoose.ConnectOptions = {
+  maxPoolSize: 10,
+  minPoolSize: 2,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+};
+
 export const connectDB = async (): Promise<void> => {
   if (isConnected) return;
 
   try {
     if (ENV.MONGODB_URI) {
       try {
-        await mongoose.connect(ENV.MONGODB_URI);
+        await mongoose.connect(ENV.MONGODB_URI, mongooseOptions);
       } catch (connErr: any) {
         if (
           connErr?.message?.includes('querySrv') ||
@@ -22,7 +29,7 @@ export const connectDB = async (): Promise<void> => {
           console.log('[Database] DNS SRV lookup failed, retrying with public DNS resolvers...');
           try {
             dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
-            await mongoose.connect(ENV.MONGODB_URI);
+            await mongoose.connect(ENV.MONGODB_URI, mongooseOptions);
           } catch (retryErr) {
             throw retryErr;
           }

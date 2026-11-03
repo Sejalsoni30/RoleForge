@@ -28,30 +28,35 @@ const generateToken = (userId: string): string => {
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { name, email, password } = RegisterSchema.parse(req.body);
+    const normalizedEmail = email.toLowerCase().trim();
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      throw new AppError('An account with this email already exists', 400);
+    // Fast single-pass hash computation
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    let user;
+    try {
+      user = await User.create({
+        name: name.trim(),
+        email: normalizedEmail,
+        passwordHash,
+        onboardingComplete: false,
+      });
+    } catch (dbErr: any) {
+      if (dbErr?.code === 11000) {
+        throw new AppError('An account with this email already exists', 400);
+      }
+      throw dbErr;
     }
-
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
-
-    const user = await User.create({
-      name,
-      email,
-      passwordHash,
-      onboardingComplete: false,
-    });
 
     const token = generateToken(user.id);
 
-    await AuditLog.create({
+    // Non-blocking asynchronous audit log
+    AuditLog.create({
       userId: user._id,
       action: 'USER_REGISTERED',
       entityType: 'User',
       entityId: user.id,
-    });
+    }).catch((err) => console.error('[AuditLog] Non-blocking register log notice:', err));
 
     res.status(201).json({
       success: true,
@@ -136,12 +141,14 @@ export const googleAuth = async (req: Request, res: Response, next: NextFunction
       throw new AppError('Email is required for Google Sign-In', 400);
     }
 
-    let user = await User.findOne({ $or: [{ googleId }, { email }] });
+    const normalizedEmail = email.toLowerCase().trim();
+    const query = googleId ? { $or: [{ googleId }, { email: normalizedEmail }] } : { email: normalizedEmail };
+    let user = await User.findOne(query);
 
     if (!user) {
       user = await User.create({
-        name: name || 'Google User',
-        email,
+        name: (name || 'Google User').trim(),
+        email: normalizedEmail,
         googleId,
         avatar,
         onboardingComplete: false,

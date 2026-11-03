@@ -35,6 +35,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoading(false);
         return;
       }
+      // If user is already populated from register/login, skip redundant fetch
+      if (user) {
+        setIsLoading(false);
+        return;
+      }
       try {
         const response = await api.get<IUser>('/auth/me');
         setUser(response.data);
@@ -47,7 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     fetchMe();
-  }, [token, logout]);
+  }, [token, logout, user]);
 
   // Listen to 401 unauthorized events
   useEffect(() => {
