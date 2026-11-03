@@ -23,7 +23,10 @@ import {
   Palette,
   Eye,
   Edit3,
+  Printer,
+  Sparkles,
 } from 'lucide-react';
+import { ResumeTemplateView } from '../components/builder/ResumeTemplateView';
 
 export const ResumeBuilderPage: React.FC = () => {
   const { success, error } = useToast();
@@ -113,6 +116,7 @@ export const ResumeBuilderPage: React.FC = () => {
     try {
       const res = await api.post<Blob>(`/builder/export/${format}`, {
         resumeId: selectedResumeId,
+        templateId,
         content: resumeData,
       });
 
@@ -484,93 +488,32 @@ export const ResumeBuilderPage: React.FC = () => {
         {/* Right Column: High-Fidelity Live Preview */}
         <div className={`lg:col-span-6 ${activeTab === 'editor' && !window.matchMedia('(min-width: 1024px)').matches ? 'hidden' : 'block'}`}>
           <div className="sticky top-6">
-            <Card className="p-8 bg-white border border-slate-300 shadow-elevated rounded-2xl min-h-[650px] font-sans text-slate-800">
-              {/* Rendered Template Output */}
-              <div className="space-y-5">
-                {/* Header */}
-                <div className={`border-b pb-4 ${templateId === 'modern-minimal' ? 'border-indigo-200' : 'border-slate-300'}`}>
-                  <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-                    {resumeData.contact.fullName || 'Candidate Name'}
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-1">
-                    {[
-                      resumeData.contact.email,
-                      resumeData.contact.phone,
-                      resumeData.contact.location,
-                      resumeData.contact.linkedin,
-                    ]
-                      .filter(Boolean)
-                      .join('  •  ')}
-                  </p>
+            <Card className="p-6 bg-white border border-slate-300 shadow-elevated rounded-2xl min-h-[650px] text-slate-800">
+              {/* Template Status Bar */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-slate-200">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Preview:</span>
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+                    {templates.find((t) => t.id === templateId)?.label}
+                  </span>
+                  <span className="text-[11px] text-slate-500 hidden sm:inline">
+                    — {templates.find((t) => t.id === templateId)?.desc}
+                  </span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-slate-600 hover:text-indigo-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all"
+                  title="Print or Save PDF from Browser"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print Preview</span>
+                </button>
+              </div>
 
-                {/* Summary */}
-                {resumeData.summary && (
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-700 mb-1">
-                      Professional Summary
-                    </h4>
-                    <p className="text-xs text-slate-700 leading-relaxed">{resumeData.summary}</p>
-                  </div>
-                )}
-
-                {/* Skills */}
-                {resumeData.skills.technical.length > 0 && (
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-700 mb-1">
-                      Technical Competencies
-                    </h4>
-                    <p className="text-xs text-slate-700 font-mono">
-                      {resumeData.skills.technical.join(', ')}
-                    </p>
-                  </div>
-                )}
-
-                {/* Experience */}
-                {resumeData.experience.length > 0 && (
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-700 mb-2">
-                      Professional Experience
-                    </h4>
-                    <div className="space-y-3">
-                      {resumeData.experience.map((exp) => (
-                        <div key={exp.id} className="text-xs">
-                          <div className="flex justify-between items-baseline">
-                            <span className="font-bold text-slate-900">{exp.position}</span>
-                            <span className="text-[11px] text-slate-500">
-                              {exp.startDate} – {exp.endDate || 'Present'}
-                            </span>
-                          </div>
-                          <p className="text-slate-600 italic mb-1">{exp.company}</p>
-                          <ul className="list-disc list-inside space-y-1 text-slate-700">
-                            {exp.highlights.map((hl, i) => (
-                              <li key={i} className="leading-relaxed">
-                                {hl}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Education */}
-                {resumeData.education.length > 0 && (
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-700 mb-1">
-                      Education
-                    </h4>
-                    {resumeData.education.map((edu) => (
-                      <div key={edu.id} className="text-xs flex justify-between items-baseline">
-                        <span className="font-bold text-slate-800">
-                          {edu.degree} in {edu.fieldOfStudy}
-                        </span>
-                        <span className="text-slate-500">{edu.institution}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              {/* Rendered Template View */}
+              <div className="resume-printable-area">
+                <ResumeTemplateView templateId={templateId} data={resumeData} />
               </div>
             </Card>
           </div>

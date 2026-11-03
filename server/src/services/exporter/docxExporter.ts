@@ -1,7 +1,28 @@
 import { Document, Paragraph, TextRun, HeadingLevel, Packer, BorderStyle } from 'docx';
-import { ParsedResumeData } from '@roleforge/shared';
+import { ParsedResumeData, ResumeTemplateId } from '@roleforge/shared';
 
-export const generateResumeDocx = async (resumeData: ParsedResumeData): Promise<Buffer> => {
+export const generateResumeDocx = async (
+  resumeData: ParsedResumeData,
+  templateId: ResumeTemplateId = 'ats-classic'
+): Promise<Buffer> => {
+  const font =
+    templateId === 'executive-refined' || templateId === 'academic-standard'
+      ? 'Times New Roman'
+      : templateId === 'technical-compact'
+      ? 'Consolas'
+      : 'Calibri';
+
+  const headingColor =
+    templateId === 'modern-minimal'
+      ? '4338CA'
+      : templateId === 'creative-bold'
+      ? '7C3AED'
+      : templateId === 'technical-compact'
+      ? '0F766E'
+      : templateId === 'executive-refined'
+      ? '0F172A'
+      : '111827';
+
   const sections: any[] = [];
 
   // Name

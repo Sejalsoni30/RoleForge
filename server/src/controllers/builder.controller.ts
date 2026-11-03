@@ -120,7 +120,7 @@ export const exportResume = async (
 ): Promise<void> => {
   try {
     const { format } = req.params;
-    const { resumeId, content } = req.body;
+    const { resumeId, content, templateId } = req.body;
 
     let resumeData = content;
     if (!resumeData && resumeId) {
@@ -136,13 +136,13 @@ export const exportResume = async (
     const candidateName = (resumeData.contact.fullName || 'Resume').replace(/[^a-zA-Z0-9]/g, '_');
 
     if (format === 'pdf') {
-      const pdfBuffer = await generateResumePdf(resumeData);
+      const pdfBuffer = await generateResumePdf(resumeData, templateId);
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${candidateName}_RoleForge.pdf"`);
       res.send(pdfBuffer);
       return;
     } else if (format === 'docx') {
-      const docxBuffer = await generateResumeDocx(resumeData);
+      const docxBuffer = await generateResumeDocx(resumeData, templateId);
       res.setHeader(
         'Content-Type',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
