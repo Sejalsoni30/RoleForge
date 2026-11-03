@@ -1,7 +1,119 @@
 import { Response, NextFunction } from 'express';
 import { SkillGap } from '../models/SkillGap';
+import { MatchAnalysis } from '../models/MatchAnalysis';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import { AppError } from '../middleware/errorHandler';
+
+export const getLatestSkillGap = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    let skillGap = await SkillGap.findOne({ userId: req.user!._id })
+      .sort({ updatedAt: -1 })
+      .populate({
+        path: 'matchAnalysisId',
+        populate: [
+          { path: 'resumeId', select: 'title' },
+          { path: 'jobDescriptionId', select: 'title company' },
+        ],
+      });
+
+    // If no SkillGap found, see if there is any MatchAnalysis that we can generate SkillGap for
+    if (!skillGap) {
+      const latestMatch = await MatchAnalysis.findOne({ userId: req.user!._id })
+        .sort({ updatedAt: -1 });
+
+      if (latestMatch) {
+        const missingMandatory = (latestMatch.evidenceLinks || [])
+          .filter((e) => e.category === 'mandatory' && e.status !== 'matched')
+          .map((e) => e.requirementText);
+
+        const missingPreferred = (latestMatch.evidenceLinks || [])
+          .filter((e) => e.category === 'preferred' && e.status !== 'matched')
+          .map((e) => e.requirementText);
+
+        const roadmapItems = [
+          ...missingMandatory.map((skill, idx) => ({
+            id: `gap-mand-${idx}`,
+            skill,
+            importance: 'critical' as const,
+            category: 'Mandatory Qualification',
+            status: 'learning' as const,
+            estimatedHours: 12,
+            actionPlan: `Complete practical project implementation and add portfolio evidence for ${skill}.`,
+            recommendedResources: [
+              { title: `${skill} Documentation & Architecture Guide`, type: 'doc' as const },
+              { title: `Hands-on Project Blueprint: ${skill}`, type: 'project' as const },
+            ],
+          })),
+          ...missingPreferred.map((skill, idx) => ({
+            id: `gap-pref-${idx}`,
+            skill,
+            importance: 'medium' as const,
+            category: 'Preferred Qualification',
+            status: 'learning' as const,
+            estimatedHours: 6,
+            actionPlan: `Familiarize with high-level workflows and basic terminology for ${skill}.`,
+            recommendedResources: [
+              { title: `${skill} Essentials Overview`, type: 'course' as const },
+            ],
+          })),
+        ];
+
+        skillGap = await SkillGap.create({
+          userId: req.user!._id,
+          matchAnalysisId: latestMatch._id,
+          missingMandatory,
+          missingPreferred,
+          roadmap: roadmapItems,
+          progressPercentage: 0,
+        });
+
+        skillGap = await SkillGap.findById(skillGap._id).populate({
+          path: 'matchAnalysisId',
+          populate: [
+            { path: 'resumeId', select: 'title' },
+            { path: 'jobDescriptionId', select: 'title company' },
+          ],
+        });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: skillGap || null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const listSkillGaps = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const skillGaps = await SkillGap.find({ userId: req.user!._id })
+      .sort({ updatedAt: -1 })
+      .populate({
+        path: 'matchAnalysisId',
+        populate: [
+          { path: 'resumeId', select: 'title' },
+          { path: 'jobDescriptionId', select: 'title company' },
+        ],
+      });
+
+    res.status(200).json({
+      success: true,
+      data: skillGaps,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const getSkillGap = async (
   req: AuthenticatedRequest,
@@ -12,6 +124,12 @@ export const getSkillGap = async (
     const skillGap = await SkillGap.findOne({
       matchAnalysisId: req.params.matchAnalysisId,
       userId: req.user!._id,
+    }).populate({
+      path: 'matchAnalysisId',
+      populate: [
+        { path: 'resumeId', select: 'title' },
+        { path: 'jobDescriptionId', select: 'title company' },
+      ],
     });
 
     if (!skillGap) {

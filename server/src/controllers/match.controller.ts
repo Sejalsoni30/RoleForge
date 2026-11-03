@@ -226,3 +226,23 @@ export const getMatchByPair = async (
   }
 };
 
+export const listMatches = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const matches = await MatchAnalysis.find({ userId: req.user!._id })
+      .sort({ updatedAt: -1 })
+      .populate('resumeId', 'title')
+      .populate('jobDescriptionId', 'title company');
+
+    res.status(200).json({
+      success: true,
+      data: matches,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
