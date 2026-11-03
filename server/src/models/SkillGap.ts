@@ -41,7 +41,23 @@ const SkillGapSchema = new Schema<ISkillGapDoc>(
     roadmap: [SkillRoadmapItemSchema],
     progressPercentage: { type: Number, default: 0 },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+  }
 );
 
 SkillGapSchema.index({ userId: 1, matchAnalysisId: 1 });

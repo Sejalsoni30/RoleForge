@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Response, NextFunction } from 'express';
 import { MatchAnalysis } from '../models/MatchAnalysis';
 import { Resume } from '../models/Resume';
@@ -171,14 +172,38 @@ export const compileMatch = async (
   }
 };
 
+const isValidObjectId = (id: unknown): boolean =>
+  typeof id === 'string' && mongoose.Types.ObjectId.isValid(id);
+
+export const getLatestMatch = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const latest = await MatchAnalysis.findOne({ userId: req.user!._id }).sort({ updatedAt: -1 });
+    res.status(200).json({
+      success: true,
+      data: latest ? { match: latest } : null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getMatch = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
+    const { id } = req.params;
+    if (!id || id === 'undefined' || !isValidObjectId(id)) {
+      throw new AppError('Match analysis record not found', 404);
+    }
+
     const match = await MatchAnalysis.findOne({
-      _id: req.params.id,
+      _id: id,
       userId: req.user!._id,
     });
 
@@ -202,6 +227,21 @@ export const getMatchByPair = async (
 ): Promise<void> => {
   try {
     const { resumeId, jobId } = req.params;
+
+    if (
+      !resumeId ||
+      !jobId ||
+      resumeId === 'undefined' ||
+      jobId === 'undefined' ||
+      !isValidObjectId(resumeId) ||
+      !isValidObjectId(jobId)
+    ) {
+      res.status(200).json({
+        success: true,
+        data: null,
+      });
+      return;
+    }
 
     const match = await MatchAnalysis.findOne({
       userId: req.user!._id,

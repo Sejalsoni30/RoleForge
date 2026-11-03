@@ -1,8 +1,12 @@
+import mongoose from 'mongoose';
 import { Response, NextFunction } from 'express';
 import { SkillGap } from '../models/SkillGap';
 import { MatchAnalysis } from '../models/MatchAnalysis';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import { AppError } from '../middleware/errorHandler';
+
+const isValidObjectId = (id: unknown): boolean =>
+  typeof id === 'string' && mongoose.Types.ObjectId.isValid(id);
 
 export const getLatestSkillGap = async (
   req: AuthenticatedRequest,
@@ -121,8 +125,13 @@ export const getSkillGap = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const { matchAnalysisId } = req.params;
+    if (!matchAnalysisId || matchAnalysisId === 'undefined' || !isValidObjectId(matchAnalysisId)) {
+      throw new AppError('Skill gap analysis not found', 404);
+    }
+
     const skillGap = await SkillGap.findOne({
-      matchAnalysisId: req.params.matchAnalysisId,
+      matchAnalysisId,
       userId: req.user!._id,
     }).populate({
       path: 'matchAnalysisId',
@@ -156,6 +165,10 @@ export const updateRoadmapItemStatus = async (
 
     if (!['learning', 'completed', 'already_known'].includes(status)) {
       throw new AppError("Status must be 'learning', 'completed', or 'already_known'.", 400);
+    }
+
+    if (!matchAnalysisId || matchAnalysisId === 'undefined' || !isValidObjectId(matchAnalysisId)) {
+      throw new AppError('Skill gap record not found', 404);
     }
 
     const skillGap = await SkillGap.findOne({

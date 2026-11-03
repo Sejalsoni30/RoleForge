@@ -76,7 +76,23 @@ const MatchAnalysisSchema = new Schema<IMatchAnalysisDoc>(
     quickWins: [{ type: String }],
     isStale: { type: Boolean, default: false },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+  }
 );
 
 MatchAnalysisSchema.index({ userId: 1, resumeId: 1, jobDescriptionId: 1 });

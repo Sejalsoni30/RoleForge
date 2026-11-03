@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Response, NextFunction } from 'express';
 import { Optimization } from '../models/Optimization';
 import { Resume } from '../models/Resume';
@@ -8,6 +9,25 @@ import { AppError } from '../middleware/errorHandler';
 import { getAIService } from '../services/ai';
 import { AuditLog } from '../models/AuditLog';
 
+const isValidObjectId = (id: unknown): boolean =>
+  typeof id === 'string' && mongoose.Types.ObjectId.isValid(id);
+
+const formatOptimization = (opt: any) => {
+  if (!opt) return null;
+  const optId = opt._id?.toString() || opt.id;
+  return {
+    id: optId,
+    _id: optId,
+    userId: opt.userId?.toString(),
+    resumeId: opt.resumeId?.toString(),
+    jobDescriptionId: opt.jobDescriptionId?.toString(),
+    suggestions: opt.suggestions,
+    status: opt.status,
+    createdAt: opt.createdAt instanceof Date ? opt.createdAt.toISOString() : opt.createdAt,
+    updatedAt: opt.updatedAt instanceof Date ? opt.updatedAt.toISOString() : opt.updatedAt,
+  };
+};
+
 export const getOptimizations = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -15,6 +35,18 @@ export const getOptimizations = async (
 ): Promise<void> => {
   try {
     const { resumeId, jobId } = req.params;
+
+    if (
+      !resumeId ||
+      !jobId ||
+      resumeId === 'undefined' ||
+      jobId === 'undefined' ||
+      !isValidObjectId(resumeId) ||
+      !isValidObjectId(jobId)
+    ) {
+      res.status(200).json({ success: true, data: null });
+      return;
+    }
 
     const opt = await Optimization.findOne({
       userId: req.user!._id,
@@ -24,7 +56,7 @@ export const getOptimizations = async (
 
     res.status(200).json({
       success: true,
-      data: opt,
+      data: formatOptimization(opt),
     });
   } catch (error) {
     next(error);
@@ -84,7 +116,7 @@ export const generateOptimizations = async (
 
     res.status(200).json({
       success: true,
-      data: opt,
+      data: formatOptimization(opt),
     });
   } catch (error) {
     next(error);
@@ -97,17 +129,25 @@ export const updateSuggestionStatus = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { id, suggestionId } = req.params;
+    let { id, suggestionId } = req.params;
     const { status, editedText } = req.body;
 
     if (!['pending', 'accepted', 'rejected', 'edited'].includes(status)) {
       throw new AppError("Status must be 'pending', 'accepted', 'rejected', or 'edited'.", 400);
     }
 
-    const opt = await Optimization.findOne({
-      _id: id,
-      userId: req.user!._id,
-    });
+    let opt = null;
+    if (id && id !== 'undefined' && id !== 'null' && isValidObjectId(id)) {
+      opt = await Optimization.findOne({
+        _id: id,
+        userId: req.user!._id,
+      });
+    } else {
+      opt = await Optimization.findOne({
+        userId: req.user!._id,
+        'suggestions.id': suggestionId,
+      });
+    }
 
     if (!opt) {
       throw new AppError('Optimization record not found', 404);
@@ -123,11 +163,12 @@ export const updateSuggestionStatus = async (
       suggestion.editedText = editedText;
     }
 
+    opt.markModified('suggestions');
     await opt.save();
 
     res.status(200).json({
       success: true,
-      data: opt,
+      data: formatOptimization(opt),
     });
   } catch (error) {
     next(error);
@@ -140,12 +181,17 @@ export const applyAcceptedOptimizations = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { id } = req.params;
+    let { id } = req.params;
 
-    const opt = await Optimization.findOne({
-      _id: id,
-      userId: req.user!._id,
-    });
+    let opt = null;
+    if (id && id !== 'undefined' && id !== 'null' && isValidObjectId(id)) {
+      opt = await Optimization.findOne({
+        _id: id,
+        userId: req.user!._id,
+      });
+    } else {
+      opt = await Optimization.findOne({ userId: req.user!._id }).sort({ updatedAt: -1 });
+    }
 
     if (!opt) throw new AppError('Optimization record not found', 404);
 

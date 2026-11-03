@@ -110,10 +110,12 @@ export const OptimizationsPage: React.FC = () => {
     customText?: string
   ) => {
     if (!optimization) return;
+    const optId = optimization.id || (optimization as any)._id;
+    if (!optId) return;
 
     try {
       const res = await api.put<IOptimization>(
-        `/optimizations/${optimization.id}/suggestion/${suggestionId}`,
+        `/optimizations/${optId}/suggestion/${suggestionId}`,
         {
           status,
           editedText: customText,
@@ -128,10 +130,12 @@ export const OptimizationsPage: React.FC = () => {
 
   const handleApplyAll = async () => {
     if (!optimization) return;
+    const optId = optimization.id || (optimization as any)._id;
+    if (!optId) return;
 
     setIsApplying(true);
     try {
-      await api.post(`/optimizations/${optimization.id}/apply`);
+      await api.post(`/optimizations/${optId}/apply`);
       success('Accepted optimizations successfully written into your resume draft!');
       navigate('/builder');
     } catch (err: any) {

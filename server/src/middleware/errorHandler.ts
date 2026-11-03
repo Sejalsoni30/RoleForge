@@ -52,6 +52,38 @@ export const errorHandler = (
     return;
   }
 
+  // Mongoose invalid ObjectId / CastError handling
+  if (err.name === 'CastError') {
+    res.status(404).json({
+      success: false,
+      message: `Resource not found with identifier: ${err.value}`,
+    });
+    return;
+  }
+
+  // Mongoose schema validation error
+  if (err.name === 'ValidationError') {
+    res.status(400).json({
+      success: false,
+      message: err.message || 'Validation error',
+      errors: Object.values(err.errors || {}).map((e: any) => ({
+        path: e.path,
+        message: e.message,
+      })),
+    });
+    return;
+  }
+
+  // MongoDB duplicate key error (code 11000)
+  if (err.code === 11000) {
+    const field = Object.keys(err.keyValue || {})[0] || 'field';
+    res.status(409).json({
+      success: false,
+      message: `A record with this ${field} already exists.`,
+    });
+    return;
+  }
+
   const statusCode = err.statusCode || 500;
   const message =
     process.env.NODE_ENV === 'production' && statusCode === 500
