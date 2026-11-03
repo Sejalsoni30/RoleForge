@@ -48,7 +48,23 @@ const ApplicationSchema = new Schema<IApplicationDoc>(
       },
     ],
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+  }
 );
 
 ApplicationSchema.index({ userId: 1, status: 1 });

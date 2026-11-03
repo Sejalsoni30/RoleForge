@@ -104,7 +104,23 @@ const ResumeSchema = new Schema<IResumeDoc>(
     version: { type: Number, default: 1 },
     isArchived: { type: Boolean, default: false },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+  }
 );
 
 ResumeSchema.index({ userId: 1, isArchived: 1 });

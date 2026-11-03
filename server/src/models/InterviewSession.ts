@@ -51,7 +51,23 @@ const InterviewSessionSchema = new Schema<IInterviewSessionDoc>(
       summary: { type: String },
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+  }
 );
 
 InterviewSessionSchema.index({ userId: 1, createdAt: -1 });

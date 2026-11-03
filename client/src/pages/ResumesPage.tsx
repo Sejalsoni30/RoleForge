@@ -125,10 +125,12 @@ export const ResumesPage: React.FC = () => {
 
   const handleSaveEdit = async () => {
     if (!selectedResume || !editingParsedData) return;
+    const resumeId = selectedResume.id || (selectedResume as any)._id;
+    if (!resumeId) return;
 
     setIsSavingEdit(true);
     try {
-      await api.put(`/resumes/${selectedResume.id}`, {
+      await api.put(`/resumes/${resumeId}`, {
         title: selectedResume.title,
         parsedData: editingParsedData,
       });

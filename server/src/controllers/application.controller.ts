@@ -1,8 +1,12 @@
+import mongoose from 'mongoose';
 import { Response, NextFunction } from 'express';
 import { Application } from '../models/Application';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import { AppError } from '../middleware/errorHandler';
 import { AuditLog } from '../models/AuditLog';
+
+const isValidObjectId = (id: unknown): boolean =>
+  typeof id === 'string' && id !== 'undefined' && id !== 'null' && mongoose.Types.ObjectId.isValid(id);
 
 export const listApplications = async (
   req: AuthenticatedRequest,
@@ -93,6 +97,10 @@ export const getApplication = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      throw new AppError('Application not found', 404);
+    }
+
     const application = await Application.findOne({
       _id: req.params.id,
       userId: req.user!._id,
@@ -115,6 +123,10 @@ export const updateApplication = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      throw new AppError('Application not found', 404);
+    }
+
     const application = await Application.findOne({
       _id: req.params.id,
       userId: req.user!._id,
@@ -161,6 +173,10 @@ export const deleteApplication = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      throw new AppError('Application not found', 404);
+    }
+
     const application = await Application.findOneAndDelete({
       _id: req.params.id,
       userId: req.user!._id,

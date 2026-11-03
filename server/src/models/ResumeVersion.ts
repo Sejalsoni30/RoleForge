@@ -61,7 +61,23 @@ const ResumeVersionSchema = new Schema<IResumeVersionDoc>(
     pdfUrl: { type: String },
     docxUrl: { type: String },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+  }
 );
 
 ResumeVersionSchema.index({ userId: 1, resumeId: 1, versionNumber: -1 });

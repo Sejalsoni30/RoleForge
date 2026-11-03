@@ -122,10 +122,12 @@ export const JobsPage: React.FC = () => {
 
   const handleSaveCorrections = async () => {
     if (!selectedJob) return;
+    const jobId = selectedJob.id || (selectedJob as any)._id;
+    if (!jobId) return;
 
     setIsSavingCorrections(true);
     try {
-      await api.put(`/jobs/${selectedJob.id}`, {
+      await api.put(`/jobs/${jobId}`, {
         title: selectedJob.title,
         company: selectedJob.company,
         parsedRequirements: selectedJob.parsedRequirements,

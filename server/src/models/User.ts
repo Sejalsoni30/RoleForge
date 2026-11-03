@@ -57,7 +57,25 @@ const UserSchema = new Schema<IUserDocument>(
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        delete ret.passwordHash;
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        delete ret.passwordHash;
+        return ret;
+      },
+    },
+  }
 );
 
 // Password comparison method

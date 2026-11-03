@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Response, NextFunction } from 'express';
 import { CoverLetter } from '../models/CoverLetter';
 import { Resume } from '../models/Resume';
@@ -6,6 +7,9 @@ import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import { AppError } from '../middleware/errorHandler';
 import { getAIService } from '../services/ai';
 import { AuditLog } from '../models/AuditLog';
+
+const isValidObjectId = (id: unknown): boolean =>
+  typeof id === 'string' && id !== 'undefined' && id !== 'null' && mongoose.Types.ObjectId.isValid(id);
 
 export const listCoverLetters = async (
   req: AuthenticatedRequest,
@@ -83,6 +87,10 @@ export const getCoverLetter = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      throw new AppError('Cover letter not found', 404);
+    }
+
     const letter = await CoverLetter.findOne({
       _id: req.params.id,
       userId: req.user!._id,
@@ -105,6 +113,10 @@ export const updateCoverLetter = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      throw new AppError('Cover letter not found', 404);
+    }
+
     const letter = await CoverLetter.findOne({
       _id: req.params.id,
       userId: req.user!._id,
@@ -134,6 +146,10 @@ export const deleteCoverLetter = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      throw new AppError('Cover letter not found', 404);
+    }
+
     const letter = await CoverLetter.findOneAndDelete({
       _id: req.params.id,
       userId: req.user!._id,

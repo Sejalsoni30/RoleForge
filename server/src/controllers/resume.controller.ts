@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Response, NextFunction } from 'express';
 import { Resume } from '../models/Resume';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
@@ -6,6 +7,9 @@ import { parseResumeDocument } from '../services/parser';
 import { getAIService } from '../services/ai';
 import { AuditLog } from '../models/AuditLog';
 import { ParsedResumeDataSchema } from '@roleforge/shared';
+
+const isValidObjectId = (id: unknown): boolean =>
+  typeof id === 'string' && id !== 'undefined' && id !== 'null' && mongoose.Types.ObjectId.isValid(id);
 
 export const listResumes = async (
   req: AuthenticatedRequest,
@@ -145,6 +149,10 @@ export const getResume = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      throw new AppError('Resume not found or access denied', 404);
+    }
+
     const resume = await Resume.findOne({
       _id: req.params.id,
       userId: req.user!._id,
@@ -182,6 +190,10 @@ export const updateResumeData = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      throw new AppError('Resume not found', 404);
+    }
+
     const resume = await Resume.findOne({
       _id: req.params.id,
       userId: req.user!._id,
@@ -226,6 +238,10 @@ export const deleteResume = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      throw new AppError('Resume not found', 404);
+    }
+
     const resume = await Resume.findOne({
       _id: req.params.id,
       userId: req.user!._id,

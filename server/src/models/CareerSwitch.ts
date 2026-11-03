@@ -46,7 +46,23 @@ const CareerSwitchSchema = new Schema<ICareerSwitchDoc>(
       },
     ],
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+  }
 );
 
 CareerSwitchSchema.index({ userId: 1, targetRole: 1 });

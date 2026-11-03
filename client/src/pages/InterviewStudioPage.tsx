@@ -162,10 +162,16 @@ export const InterviewStudioPage: React.FC = () => {
     const currentQuestion = session.questions[activeQuestionIndex];
     if (!currentQuestion) return;
 
+    const sessionId = session.id || (session as any)._id;
+    if (!sessionId) {
+      error('Invalid interview session ID.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const res = await api.post<{ session: IInterviewSession }>(
-        `/interviews/${session.id}/answer`,
+        `/interviews/${sessionId}/answer`,
         {
           questionId: currentQuestion.id,
           userAnswer,

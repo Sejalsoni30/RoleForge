@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Response, NextFunction } from 'express';
 import { JobDescription } from '../models/JobDescription';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
@@ -5,6 +6,9 @@ import { AppError } from '../middleware/errorHandler';
 import { getAIService } from '../services/ai';
 import { AuditLog } from '../models/AuditLog';
 import { ParsedJobRequirementsSchema } from '@roleforge/shared';
+
+const isValidObjectId = (id: unknown): boolean =>
+  typeof id === 'string' && id !== 'undefined' && id !== 'null' && mongoose.Types.ObjectId.isValid(id);
 
 export const listJobs = async (
   req: AuthenticatedRequest,
@@ -94,6 +98,10 @@ export const getJob = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      throw new AppError('Job description not found', 404);
+    }
+
     const job = await JobDescription.findOne({
       _id: req.params.id,
       userId: req.user!._id,
@@ -129,6 +137,10 @@ export const updateJobRequirements = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      throw new AppError('Job description not found', 404);
+    }
+
     const job = await JobDescription.findOne({
       _id: req.params.id,
       userId: req.user!._id,
@@ -173,6 +185,10 @@ export const deleteJob = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      throw new AppError('Job description not found', 404);
+    }
+
     const job = await JobDescription.findOneAndDelete({
       _id: req.params.id,
       userId: req.user!._id,

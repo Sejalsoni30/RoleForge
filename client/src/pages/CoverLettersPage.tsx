@@ -92,9 +92,15 @@ export const CoverLettersPage: React.FC = () => {
 
   const handleSaveActive = async () => {
     if (!activeLetter) return;
+    const letterId = activeLetter.id || (activeLetter as any)._id;
+    if (!letterId) {
+      error('Cannot save: Invalid letter ID.');
+      return;
+    }
+
     setIsSaving(true);
     try {
-      await api.put(`/cover-letters/${activeLetter.id}`, {
+      await api.put(`/cover-letters/${letterId}`, {
         content: activeLetter.content,
         title: activeLetter.title,
         tone: activeLetter.tone,
@@ -122,7 +128,8 @@ export const CoverLettersPage: React.FC = () => {
     try {
       await api.delete(`/cover-letters/${deleteLetterId}`);
       success('Cover letter deleted.');
-      if (activeLetter?.id === deleteLetterId) setActiveLetter(null);
+      const currentActiveId = activeLetter?.id || (activeLetter as any)?._id;
+      if (currentActiveId === deleteLetterId) setActiveLetter(null);
       setDeleteLetterId(null);
       await fetchData();
     } catch (err: any) {
@@ -178,33 +185,37 @@ export const CoverLettersPage: React.FC = () => {
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Drafts ({letters.length})
             </h3>
-            {letters.map((letter) => (
-              <div
-                key={letter.id}
-                onClick={() => setActiveLetter(letter)}
-                className={`p-4 rounded-xl border cursor-pointer transition-all ${
-                  activeLetter?.id === letter.id
-                    ? 'border-indigo-600 bg-indigo-50/60 shadow-sm'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-slate-900 truncate">{letter.title}</h4>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDeleteLetterId(letter.id);
-                    }}
-                    className="text-slate-400 hover:text-rose-600 p-1"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+            {letters.map((letter) => {
+              const letterId = letter.id || (letter as any)._id;
+              const activeId = activeLetter?.id || (activeLetter as any)?._id;
+              return (
+                <div
+                  key={letterId}
+                  onClick={() => setActiveLetter(letter)}
+                  className={`p-4 rounded-xl border cursor-pointer transition-all ${
+                    activeId === letterId
+                      ? 'border-indigo-600 bg-indigo-50/60 shadow-sm'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold text-slate-900 truncate">{letter.title}</h4>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteLetterId(letterId);
+                      }}
+                      className="text-slate-400 hover:text-rose-600 p-1"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    {letter.companyName} • {letter.tone.toUpperCase()}
+                  </p>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  {letter.companyName} • {letter.tone.toUpperCase()}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Active Editor Panel */}

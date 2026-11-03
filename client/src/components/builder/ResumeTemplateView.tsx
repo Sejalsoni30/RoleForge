@@ -894,3 +894,4 @@ export const ResumeTemplateView: React.FC<ResumeTemplateViewProps> = ({ template
     </div>
   );
 };
+

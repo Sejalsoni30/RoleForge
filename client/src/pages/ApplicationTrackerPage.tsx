@@ -97,6 +97,7 @@ export const ApplicationTrackerPage: React.FC = () => {
   };
 
   const handleUpdateStatus = async (appId: string, newStatus: ApplicationStatus) => {
+    if (!appId || appId === 'undefined') return;
     try {
       await api.put(`/applications/${appId}`, { status: newStatus });
       success(`Status updated to ${newStatus}!`);
@@ -107,7 +108,7 @@ export const ApplicationTrackerPage: React.FC = () => {
   };
 
   const handleDelete = async () => {
-    if (!deleteAppId) return;
+    if (!deleteAppId || deleteAppId === 'undefined') return;
     setIsDeleting(true);
     try {
       await api.delete(`/applications/${deleteAppId}`);
@@ -201,70 +202,73 @@ export const ApplicationTrackerPage: React.FC = () => {
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredApps.map((app) => (
-            <Card key={app.id} className="p-5 flex flex-col justify-between space-y-4">
-              <div>
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div>
-                    <h4 className="text-base font-bold text-slate-900">{app.company}</h4>
-                    <p className="text-xs font-semibold text-indigo-600">{app.role}</p>
+          {filteredApps.map((app) => {
+            const appId = app.id || (app as any)._id;
+            return (
+              <Card key={appId} className="p-5 flex flex-col justify-between space-y-4">
+                <div>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div>
+                      <h4 className="text-base font-bold text-slate-900">{app.company}</h4>
+                      <p className="text-xs font-semibold text-indigo-600">{app.role}</p>
+                    </div>
+                    <ApplicationStatusBadge status={app.status} />
                   </div>
-                  <ApplicationStatusBadge status={app.status} />
+
+                  <div className="space-y-1.5 text-xs text-slate-500 pt-2">
+                    {app.appliedDate && (
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Applied on {app.appliedDate}</span>
+                      </div>
+                    )}
+                    {app.salary && (
+                      <div className="flex items-center gap-1.5">
+                        <DollarSign className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{app.salary}</span>
+                      </div>
+                    )}
+                    {app.location && (
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{app.location}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {app.notes && (
+                    <p className="mt-3 p-2.5 rounded-lg bg-slate-50 border border-slate-200/60 text-xs text-slate-600 line-clamp-2">
+                      {app.notes}
+                    </p>
+                  )}
                 </div>
 
-                <div className="space-y-1.5 text-xs text-slate-500 pt-2">
-                  {app.appliedDate && (
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Applied on {app.appliedDate}</span>
-                    </div>
-                  )}
-                  {app.salary && (
-                    <div className="flex items-center gap-1.5">
-                      <DollarSign className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{app.salary}</span>
-                    </div>
-                  )}
-                  {app.location && (
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{app.location}</span>
-                    </div>
-                  )}
+                {/* Status transition dropdown & delete */}
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <select
+                    value={app.status}
+                    onChange={(e) => handleUpdateStatus(appId, e.target.value as ApplicationStatus)}
+                    className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700"
+                  >
+                    <option value="saved">Saved</option>
+                    <option value="applied">Applied</option>
+                    <option value="interviewing">Interviewing</option>
+                    <option value="offered">Offered</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="withdrawn">Withdrawn</option>
+                  </select>
+
+                  <button
+                    onClick={() => setDeleteAppId(appId)}
+                    className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg transition-colors"
+                    title="Remove application"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
-
-                {app.notes && (
-                  <p className="mt-3 p-2.5 rounded-lg bg-slate-50 border border-slate-200/60 text-xs text-slate-600 line-clamp-2">
-                    {app.notes}
-                  </p>
-                )}
-              </div>
-
-              {/* Status transition dropdown & delete */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                <select
-                  value={app.status}
-                  onChange={(e) => handleUpdateStatus(app.id, e.target.value as ApplicationStatus)}
-                  className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700"
-                >
-                  <option value="saved">Saved</option>
-                  <option value="applied">Applied</option>
-                  <option value="interviewing">Interviewing</option>
-                  <option value="offered">Offered</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="withdrawn">Withdrawn</option>
-                </select>
-
-                <button
-                  onClick={() => setDeleteAppId(app.id)}
-                  className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg transition-colors"
-                  title="Remove application"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
 

@@ -68,7 +68,23 @@ const JobDescriptionSchema = new Schema<IJobDescriptionDoc>(
     },
     userCorrectionsApplied: { type: Boolean, default: false },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (_doc, ret: any) => {
+        ret.id = ret._id?.toString();
+        return ret;
+      },
+    },
+  }
 );
 
 JobDescriptionSchema.index({ userId: 1, createdAt: -1 });
