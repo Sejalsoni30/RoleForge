@@ -22,15 +22,20 @@ import {
   Award,
   ChevronRight,
   ChevronDown,
-  Star,
   Terminal,
   Palette,
-  Eye,
   Check,
   HelpCircle,
   Users,
   Compass,
   Lock,
+  MessageSquare,
+  Mic,
+  GitCompare,
+  BarChart3,
+  ThumbsUp,
+  Clock,
+  RefreshCw,
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
@@ -46,6 +51,12 @@ export const LandingPage: React.FC = () => {
 
   // FAQ accordion state
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+
+  // Interactive matching criteria filter in #matching
+  const [activeMatchCategory, setActiveMatchCategory] = useState<'all' | 'mandatory' | 'preferred'>('all');
+
+  // Interactive interview question toggle in #interview
+  const [activeQuestionTab, setActiveQuestionTab] = useState<'tech' | 'behavioral' | 'situational'>('tech');
 
   // Scroll animations for pipeline section
   const { scrollYProgress } = useScroll();
@@ -140,7 +151,7 @@ export const LandingPage: React.FC = () => {
             initial={{ opacity: 0, y: -15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/95 border border-indigo-200 shadow-sm text-xs font-bold text-indigo-700 mb-6 backdrop-blur-md"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/95 border border-indigo-200 shadow-xs text-xs font-bold text-indigo-700 mb-6 backdrop-blur-md"
           >
             <Sparkles className="w-3.5 h-3.5 text-indigo-500 animate-pulse" />
             <span>RoleForge 2.0 • Deterministic Resume-to-Job Compiler</span>
@@ -261,7 +272,7 @@ export const LandingPage: React.FC = () => {
                   rotate: heroHovered ? 0 : -2,
                 }}
                 transition={{ duration: 0.4 }}
-                className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-left space-y-2 shadow-sm"
+                className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-left space-y-2 shadow-xs"
               >
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
                   <FileText className="w-3.5 h-3.5 text-indigo-600" />
@@ -292,7 +303,7 @@ export const LandingPage: React.FC = () => {
                   rotate: heroHovered ? 0 : 2,
                 }}
                 transition={{ duration: 0.4 }}
-                className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-100 text-left space-y-2 shadow-sm"
+                className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-100 text-left space-y-2 shadow-xs"
               >
                 <div className="flex items-center justify-between text-xs font-bold text-indigo-900">
                   <div className="flex items-center gap-2">
@@ -345,160 +356,9 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* =========================================================================
-          INTERACTIVE DEMO: BEFORE VS AFTER TRANSFORMATION
-          ========================================================================= */}
-      <section className="py-20 bg-slate-50 border-y border-slate-200/80 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
-              Interactive Demonstration
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-display mt-3">
-              See the RoleForge difference in action.
-            </h2>
-            <p className="text-slate-600 text-sm mt-3">
-              Toggle between a standard generic resume and a RoleForge-compiled version tailored to an engineering lead role.
-            </p>
-
-            {/* Toggle control */}
-            <div className="inline-flex items-center gap-2 p-1.5 rounded-2xl bg-white border border-slate-200 shadow-sm mt-6">
-              <button
-                onClick={() => setDemoState('before')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                  demoState === 'before'
-                    ? 'bg-rose-500 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Before: Generic Resume (54%)
-              </button>
-              <button
-                onClick={() => setDemoState('after')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                  demoState === 'after'
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                After: RoleForge Compiled (94%)
-              </button>
-            </div>
-          </div>
-
-          {/* Interactive Card */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
-            {/* Score & Diagnostic Card */}
-            <div className="md:col-span-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">ATS Alignment Metric</span>
-                <div className="flex items-center gap-4 mt-4">
-                  <div
-                    className={`w-16 h-16 rounded-2xl flex items-center justify-center font-extrabold text-2xl font-display ${
-                      demoState === 'after' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-                    }`}
-                  >
-                    {demoState === 'after' ? '94%' : '54%'}
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900 text-sm">
-                      {demoState === 'after' ? 'High Tier Interview Probability' : 'Risk of Immediate ATS Rejection'}
-                    </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {demoState === 'after' ? 'Evidence verified across all mandatory criteria' : 'Missing 4 critical keywords from Job Spec'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-6 space-y-2.5 text-xs">
-                  <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50">
-                    <span className="text-slate-600">Mandatory Skills:</span>
-                    <span className={`font-bold ${demoState === 'after' ? 'text-emerald-700' : 'text-rose-600'}`}>
-                      {demoState === 'after' ? '6 of 6 Matched (100%)' : '2 of 6 Matched (33%)'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50">
-                    <span className="text-slate-600">Evidence Grounding:</span>
-                    <span className={`font-bold ${demoState === 'after' ? 'text-emerald-700' : 'text-amber-600'}`}>
-                      {demoState === 'after' ? '12 Verifiable Line Items' : 'Vague / Unanchored'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50">
-                    <span className="text-slate-600">Quantified Impact:</span>
-                    <span className={`font-bold ${demoState === 'after' ? 'text-emerald-700' : 'text-rose-600'}`}>
-                      {demoState === 'after' ? '5 Key Metrics Provided' : '0 Quantitative Results'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-slate-100">
-                <Button
-                  size="sm"
-                  onClick={() => navigate('/register')}
-                  className="w-full text-xs font-bold"
-                  rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
-                >
-                  Compile My Resume
-                </Button>
-              </div>
-            </div>
-
-            {/* Experience Bullet Diff Card */}
-            <div className="md:col-span-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-800">Target Role: Senior Full-Stack Engineer</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono">
-                      Stripe Payments
-                    </span>
-                  </div>
-                  <span className="text-xs font-semibold text-indigo-600">Experience Optimization</span>
-                </div>
-
-                <div className="mt-4 space-y-4">
-                  {demoState === 'before' ? (
-                    <div className="p-4 rounded-xl bg-rose-50/50 border border-rose-200/80 space-y-2">
-                      <div className="flex items-center gap-2 text-rose-800 font-bold text-xs">
-                        <span>⚠ Generic, Unoptimized Experience Bullet</span>
-                      </div>
-                      <p className="text-xs text-slate-700 leading-relaxed font-mono">
-                        "Responsible for maintaining web applications using React and Node.js. Fixed bugs and worked with other team members on deployment."
-                      </p>
-                      <p className="text-[11px] text-rose-600">
-                        Flaws: Passive voice ("responsible for"), zero metrics, no mention of scalability, fails mandatory JD requirement "Microservices Architecture".
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="p-4 rounded-xl bg-emerald-50/50 border border-emerald-200/80 space-y-2">
-                      <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs">
-                        <span>✓ RoleForge Verified & Optimized Experience Bullet</span>
-                      </div>
-                      <p className="text-xs text-slate-800 leading-relaxed font-mono font-medium">
-                        "Architected scalable microservices utilizing Node.js, TypeScript, and React; reduced end-to-end payment processing latency by 32% across 1.4M daily transactions."
-                      </p>
-                      <div className="flex items-center gap-2 text-[11px] text-emerald-700 font-medium">
-                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        <span>Grounding Evidence: Directly fulfills Stripe's mandatory qualification for high-scale microservices.</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Verified against Workday, Taleo, Greenhouse parsing engines</span>
-                <span className="text-indigo-600 font-bold">100% Truth Grounded</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =========================================================================
           CONTINUOUS PIPELINE STORYTELLING: HOW IT WORKS
           ========================================================================= */}
-      <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
             End-to-End Pipeline
@@ -587,6 +447,408 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* =========================================================================
+          KEY PILLARS SECTION: INTELLIGENCE
+          ========================================================================= */}
+      <section id="intelligence" className="py-24 bg-slate-50 border-y border-slate-200/80 px-4 sm:px-6 lg:px-8 scroll-mt-24">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+              Core Architecture
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-display mt-3">
+              Engineered around four foundational pillars.
+            </h2>
+            <p className="text-slate-600 text-sm mt-3">
+              RoleForge prioritizes deterministic verification and privacy over generative embellishment.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4 hover:border-indigo-200 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-indigo-100/60 text-indigo-700 flex items-center justify-center">
+                <Cpu className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Truth-Bound Optimization</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                RoleForge never invents companies, dates, numbers, or certifications. When an impact metric is missing, it explicitly prompts you to fill in your real accomplishments.
+              </p>
+            </div>
+
+            <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4 hover:border-emerald-200 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100/60 text-emerald-700 flex items-center justify-center">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">ATS Readability Assurance</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Standard single-column layouts designed to sail through Taleo, Workday, Greenhouse, and Lever parsing engines without missing headers or garbled columns.
+              </p>
+            </div>
+
+            <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4 hover:border-violet-200 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-violet-100/60 text-violet-700 flex items-center justify-center">
+                <Zap className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Full Lifecycle CRM</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Track applications from initial draft through offers, link tailored resume versions to exact job descriptions, and prepare tailored interview answers with audio feedback.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SECTION: JOB MATCHING & EVIDENCE GROUNDING STUDIO (#matching)
+          ========================================================================= */}
+      <section id="matching" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+                Grounding Engine
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-display mt-3">
+                Job Matching & Evidence Grounding Studio
+              </h2>
+              <p className="text-slate-600 text-sm sm:text-base mt-2 max-w-2xl">
+                Every requirement is mapped against explicit lines in your resume. See exactly what matches, what is partially demonstrated, and what requires portfolio proof.
+              </p>
+            </div>
+
+            {/* Filter controls */}
+            <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl text-xs font-bold">
+              {(['all', 'mandatory', 'preferred'] as const).map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveMatchCategory(cat)}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${
+                    activeMatchCategory === cat
+                      ? 'bg-white text-indigo-700 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Interactive Evidence Studio Card */}
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-md p-6 sm:p-8 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                  <GitCompare className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-slate-900">Target Role: Senior Platform Engineer</h4>
+                  <p className="text-xs text-slate-500 font-medium">Evaluated against: candidate_resume_v2.pdf (Overall Score: 92%)</p>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => navigate('/register')}
+                className="font-bold text-xs"
+                rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+              >
+                Compile Your Match
+              </Button>
+            </div>
+
+            {/* Evidence Link Items */}
+            <div className="space-y-3">
+              {(activeMatchCategory === 'all' || activeMatchCategory === 'mandatory') && (
+                <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                        100% Matched
+                      </span>
+                      <span className="text-xs font-bold text-slate-900">
+                        Mandatory: 4+ years React, TypeScript & State Management
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600">
+                      <strong>Cited in Resume:</strong> "Architected core frontend client with React, TypeScript, and Redux Toolkit for 850k monthly active users."
+                    </p>
+                  </div>
+                  <span className="text-xs font-semibold text-emerald-700 shrink-0">Section: Experience (Lead Role)</span>
+                </div>
+              )}
+
+              {(activeMatchCategory === 'all' || activeMatchCategory === 'mandatory') && (
+                <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                        88% Matched
+                      </span>
+                      <span className="text-xs font-bold text-slate-900">
+                        Mandatory: High-throughput API architecture with Node.js
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600">
+                      <strong>Cited in Resume:</strong> "Engineered backend microservices in Node.js/Express handling 3,200 RPS with Redis distributed caching."
+                    </p>
+                  </div>
+                  <span className="text-xs font-semibold text-emerald-700 shrink-0">Section: Technical Skills & Projects</span>
+                </div>
+              )}
+
+              {(activeMatchCategory === 'all' || activeMatchCategory === 'preferred') && (
+                <div className="p-4 rounded-xl border border-amber-200 bg-amber-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-800">
+                        Partially Demonstrated
+                      </span>
+                      <span className="text-xs font-bold text-slate-900">
+                        Preferred: Docker Containerization & Kubernetes Orchestration
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600">
+                      <strong>Cited in Resume:</strong> "Containerized microservices using Docker; minimal mentions of production Kubernetes clusters."
+                    </p>
+                  </div>
+                  <span className="text-xs font-semibold text-amber-700 shrink-0">Optimization Available</span>
+                </div>
+              )}
+
+              {(activeMatchCategory === 'all' || activeMatchCategory === 'preferred') && (
+                <div className="p-4 rounded-xl border border-indigo-200 bg-indigo-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-100 text-indigo-800">
+                        Roadmap Action
+                      </span>
+                      <span className="text-xs font-bold text-slate-900">
+                        Bonus: AWS Solutions Architect Certification
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600">
+                      <strong>Skill Gap Plan:</strong> Added to your personal 30-day learning roadmap with official AWS exam study guides.
+                    </p>
+                  </div>
+                  <span className="text-xs font-semibold text-indigo-700 shrink-0">Milestone Roadmap</span>
+                </div>
+              )}
+            </div>
+
+            {/* Bottom summary bar */}
+            <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
+              <div className="flex items-center gap-4">
+                <span>✓ 4 of 4 Requirements Analyzed</span>
+                <span>•</span>
+                <span>Zero Hallucinations Guarantee</span>
+              </div>
+              <button
+                onClick={() => navigate('/register')}
+                className="text-indigo-600 font-bold hover:underline"
+              >
+                Upload your resume to run this check →
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SECTION: OPTIMIZATION STUDIO (#studio)
+          ========================================================================= */}
+      <section id="studio" className="py-24 bg-slate-50 border-y border-slate-200/80 px-4 sm:px-6 lg:px-8 scroll-mt-24">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+              Optimization Studio
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-display mt-3">
+              Side-by-Side Bullet Rewriting with Total Editorial Control.
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base mt-3">
+              Accept, reject, or edit bullet optimizations in real time. We never fabricate fake employment or invent false numbers.
+            </p>
+          </div>
+
+          {/* Interactive Optimization Diff Card */}
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-md p-6 sm:p-8 space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-700 flex items-center justify-center font-bold">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-slate-900">Experience Bullet Optimization #1</h4>
+                  <p className="text-xs text-slate-500">Targeting JD: "Design and implement high-scale payment systems"</p>
+                </div>
+              </div>
+              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-violet-100 text-violet-800">
+                Pending Your Review
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Original Bullet */}
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Current Resume Bullet</span>
+                <p className="text-xs text-slate-700 font-mono leading-relaxed">
+                  "Worked on the payments system, updated APIs, and assisted team with database fixes."
+                </p>
+                <p className="text-[11px] text-rose-500 font-medium">
+                  Weaknesses: Lacks impact metrics, passive phrasing ("worked on"), missing technical stack keywords.
+                </p>
+              </div>
+
+              {/* Proposed Optimization */}
+              <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">RoleForge Proposed Optimization</span>
+                <p className="text-xs text-slate-900 font-mono font-medium leading-relaxed">
+                  "Architected distributed payment processing microservice with Node.js and Redis, decreasing transaction checkout latency by 28% across $8.5M monthly volume."
+                </p>
+                <p className="text-[11px] text-emerald-700 font-medium">
+                  Rationale: Front-loads active verb, targets the exact payment qualification, and highlights quantitative scale.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-slate-100">
+              <span className="text-xs text-slate-500">You can edit the text directly before accepting.</span>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => navigate('/register')}
+                  className="text-xs"
+                >
+                  Edit Manually
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => navigate('/register')}
+                  className="text-xs bg-emerald-600 hover:bg-emerald-700 font-bold"
+                  leftIcon={<Check className="w-3.5 h-3.5" />}
+                >
+                  Accept & Write to Resume
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SECTION: AI INTERVIEW PREPARATION STUDIO (#interview)
+          ========================================================================= */}
+      <section id="interview" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+                Interview Intelligence
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-display mt-3">
+                AI Interview Studio with Hiring Rubrics
+              </h2>
+              <p className="text-slate-600 text-sm sm:text-base mt-2 max-w-2xl">
+                Practice role-tailored technical and behavioral questions generated directly from your target job description. Receive instant scoring and refinement tips.
+              </p>
+            </div>
+
+            {/* Question category selector */}
+            <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl text-xs font-bold">
+              <button
+                onClick={() => setActiveQuestionTab('tech')}
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  activeQuestionTab === 'tech' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-600'
+                }`}
+              >
+                Technical Architecture
+              </button>
+              <button
+                onClick={() => setActiveQuestionTab('behavioral')}
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  activeQuestionTab === 'behavioral' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-600'
+                }`}
+              >
+                Behavioral (STAR)
+              </button>
+              <button
+                onClick={() => setActiveQuestionTab('situational')}
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  activeQuestionTab === 'situational' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-600'
+                }`}
+              >
+                Leadership & Scale
+              </button>
+            </div>
+          </div>
+
+          {/* Interactive Mock Interview Card */}
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-md p-6 sm:p-8 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                  <Mic className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-slate-900">
+                    {activeQuestionTab === 'tech'
+                      ? 'Technical Deep Dive: High-Load Database Failure'
+                      : activeQuestionTab === 'behavioral'
+                      ? 'STAR Question: Cross-Functional Disagreement'
+                      : 'Situational Scenario: Tight Release Deadlines'}
+                  </h4>
+                  <p className="text-xs text-slate-500 font-medium">Difficulty: Hard • Audio & Text recording supported</p>
+                </div>
+              </div>
+              <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                Evaluation Score: 94/100
+              </span>
+            </div>
+
+            {/* Question prompt */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Interviewer Question Prompt</span>
+              <p className="text-sm font-semibold text-slate-900">
+                {activeQuestionTab === 'tech'
+                  ? '"Tell me about a time you diagnosed and mitigated a severe database latency spike during peak customer traffic. What telemetry did you look at, and how did you resolve it?"'
+                  : activeQuestionTab === 'behavioral'
+                  ? '"Describe a situation where a product stakeholder wanted a feature delivered on a timeline you believed would compromise security or reliability. How did you negotiate?"'
+                  : '"If you inherit a legacy codebase with zero automated tests and an immediate customer-facing outage, what are your first three mitigation actions?"'}
+              </p>
+            </div>
+
+            {/* Real-time rubric feedback */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div className="p-3.5 rounded-xl bg-emerald-50/50 border border-emerald-200 space-y-1">
+                <span className="font-bold text-emerald-800">✓ Technical Depth</span>
+                <p className="text-slate-600">Correctly detailed slow query logs, indexing bottlenecks, and connection pool starvation.</p>
+              </div>
+              <div className="p-3.5 rounded-xl bg-emerald-50/50 border border-emerald-200 space-y-1">
+                <span className="font-bold text-emerald-800">✓ Communication & STAR</span>
+                <p className="text-slate-600">Clear Situation, Task, Action, and Result framing with measurable outcome metrics.</p>
+              </div>
+              <div className="p-3.5 rounded-xl bg-indigo-50/50 border border-indigo-200 space-y-1">
+                <span className="font-bold text-indigo-800">💡 Recommended Refinement</span>
+                <p className="text-slate-600">Mention automated canary deployments and post-incident blameless retrospectives.</p>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
+              <span>Includes AI voice transcription and customized hiring manager rubrics</span>
+              <Button
+                size="sm"
+                onClick={() => navigate('/register')}
+                className="font-bold text-xs"
+                rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+              >
+                Start Free Practice Session
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
           7 VERIFIABLE RESUME TEMPLATES SHOWCASE
           ========================================================================= */}
       <section className="py-20 bg-slate-50 border-y border-slate-200/80 px-4 sm:px-6 lg:px-8">
@@ -610,7 +872,7 @@ export const LandingPage: React.FC = () => {
                   onClick={() => setActiveTemplate(tpl.id)}
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                     activeTemplate === tpl.id
-                      ? 'bg-indigo-600 text-white shadow-sm'
+                      ? 'bg-indigo-600 text-white shadow-xs'
                       : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
                   }`}
                 >
@@ -660,47 +922,150 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* =========================================================================
-          KEY PILLARS SECTION
+          INTERACTIVE DEMO: BEFORE VS AFTER TRANSFORMATION
           ========================================================================= */}
-      <section id="intelligence" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
-            Core Architecture
+            Interactive Demonstration
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-display mt-3">
-            Engineered around four foundational pillars.
+            See the RoleForge difference in action.
           </h2>
+          <p className="text-slate-600 text-sm mt-3">
+            Toggle between a standard generic resume and a RoleForge-compiled version tailored to an engineering lead role.
+          </p>
+
+          {/* Toggle control */}
+          <div className="inline-flex items-center gap-2 p-1.5 rounded-2xl bg-white border border-slate-200 shadow-xs mt-6">
+            <button
+              onClick={() => setDemoState('before')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                demoState === 'before'
+                  ? 'bg-rose-500 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Before: Generic Resume (54%)
+            </button>
+            <button
+              onClick={() => setDemoState('after')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                demoState === 'after'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              After: RoleForge Compiled (94%)
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4 hover:border-indigo-200 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-indigo-100/60 text-indigo-700 flex items-center justify-center">
-              <Cpu className="w-6 h-6" />
+        {/* Interactive Card */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+          {/* Score & Diagnostic Card */}
+          <div className="md:col-span-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">ATS Alignment Metric</span>
+              <div className="flex items-center gap-4 mt-4">
+                <div
+                  className={`w-16 h-16 rounded-2xl flex items-center justify-center font-extrabold text-2xl font-display ${
+                    demoState === 'after' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                  }`}
+                >
+                  {demoState === 'after' ? '94%' : '54%'}
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 text-sm">
+                    {demoState === 'after' ? 'High Tier Interview Probability' : 'Risk of Immediate ATS Rejection'}
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {demoState === 'after' ? 'Evidence verified across all mandatory criteria' : 'Missing 4 critical keywords from Job Spec'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-2.5 text-xs">
+                <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50">
+                  <span className="text-slate-600">Mandatory Skills:</span>
+                  <span className={`font-bold ${demoState === 'after' ? 'text-emerald-700' : 'text-rose-600'}`}>
+                    {demoState === 'after' ? '6 of 6 Matched (100%)' : '2 of 6 Matched (33%)'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50">
+                  <span className="text-slate-600">Evidence Grounding:</span>
+                  <span className={`font-bold ${demoState === 'after' ? 'text-emerald-700' : 'text-amber-600'}`}>
+                    {demoState === 'after' ? '12 Verifiable Line Items' : 'Vague / Unanchored'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50">
+                  <span className="text-slate-600">Quantified Impact:</span>
+                  <span className={`font-bold ${demoState === 'after' ? 'text-emerald-700' : 'text-rose-600'}`}>
+                    {demoState === 'after' ? '5 Key Metrics Provided' : '0 Quantitative Results'}
+                  </span>
+                </div>
+              </div>
             </div>
-            <h3 className="text-xl font-bold text-slate-900">Truth-Bound Optimization</h3>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              RoleForge never invents companies, dates, numbers, or certifications. When an impact metric is missing, it explicitly prompts you to fill in your real accomplishments.
-            </p>
+
+            <div className="mt-6 pt-4 border-t border-slate-100">
+              <Button
+                size="sm"
+                onClick={() => navigate('/register')}
+                className="w-full text-xs font-bold"
+                rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+              >
+                Compile My Resume
+              </Button>
+            </div>
           </div>
 
-          <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4 hover:border-emerald-200 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-emerald-100/60 text-emerald-700 flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-900">ATS Readability Assurance</h3>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              Standard single-column layouts designed to sail through Taleo, Workday, Greenhouse, and Lever parsing engines without missing headers or garbled columns.
-            </p>
-          </div>
+          {/* Experience Bullet Diff Card */}
+          <div className="md:col-span-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-800">Target Role: Senior Full-Stack Engineer</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono">
+                    Stripe Payments
+                  </span>
+                </div>
+                <span className="text-xs font-semibold text-indigo-600">Experience Optimization</span>
+              </div>
 
-          <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4 hover:border-violet-200 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-violet-100/60 text-violet-700 flex items-center justify-center">
-              <Zap className="w-6 h-6" />
+              <div className="mt-4 space-y-4">
+                {demoState === 'before' ? (
+                  <div className="p-4 rounded-xl bg-rose-50/50 border border-rose-200/80 space-y-2">
+                    <div className="flex items-center gap-2 text-rose-800 font-bold text-xs">
+                      <span>⚠ Generic, Unoptimized Experience Bullet</span>
+                    </div>
+                    <p className="text-xs text-slate-700 leading-relaxed font-mono">
+                      "Responsible for maintaining web applications using React and Node.js. Fixed bugs and worked with other team members on deployment."
+                    </p>
+                    <p className="text-[11px] text-rose-600">
+                      Flaws: Passive voice ("responsible for"), zero metrics, no mention of scalability, fails mandatory JD requirement "Microservices Architecture".
+                    </p>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl bg-emerald-50/50 border border-emerald-200/80 space-y-2">
+                    <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs">
+                      <span>✓ RoleForge Verified & Optimized Experience Bullet</span>
+                    </div>
+                    <p className="text-xs text-slate-800 leading-relaxed font-mono font-medium">
+                      "Architected scalable microservices utilizing Node.js, TypeScript, and React; reduced end-to-end payment processing latency by 32% across 1.4M daily transactions."
+                    </p>
+                    <div className="flex items-center gap-2 text-[11px] text-emerald-700 font-medium">
+                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>Grounding Evidence: Directly fulfills Stripe's mandatory qualification for high-scale microservices.</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-            <h3 className="text-xl font-bold text-slate-900">Full Lifecycle CRM</h3>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              Track applications from initial draft through offers, link tailored resume versions to exact job descriptions, and prepare tailored interview answers with audio feedback.
-            </p>
+
+            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <span>Verified against Workday, Taleo, Greenhouse parsing engines</span>
+              <span className="text-indigo-600 font-bold">100% Truth Grounded</span>
+            </div>
           </div>
         </div>
       </section>
