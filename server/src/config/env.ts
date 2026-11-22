@@ -28,7 +28,9 @@ export const getIntegrationStatus = () => {
     geminiConfigured: Boolean(ENV.GEMINI_API_KEY),
     openaiConfigured: Boolean(ENV.OPENAI_API_KEY),
     googleOAuthConfigured: Boolean(ENV.GOOGLE_CLIENT_ID),
-    cloudinaryConfigured: Boolean(ENV.CLOUDINARY_CLOUD_NAME && ENV.CLOUDINARY_API_KEY),
+    cloudinaryConfigured: Boolean(
+      ENV.CLOUDINARY_CLOUD_NAME && ENV.CLOUDINARY_API_KEY && ENV.CLOUDINARY_API_SECRET
+    ),
   };
 };
 

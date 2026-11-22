@@ -1,5 +1,6 @@
 import { evaluateATSReadability } from '../services/ats';
 import { HeuristicEngine } from '../services/ai/heuristicEngine';
+import { getIntegrationStatus, ENV } from '../config/env';
 import {
   RegisterSchema,
   LoginSchema,
@@ -35,6 +36,20 @@ describe('RoleForge Semantic Compiler Engine Tests', () => {
         password: 'mypassword',
       };
       expect(() => LoginSchema.parse(valid)).not.toThrow();
+    });
+
+    it('accurately reports external integration readiness and requires complete Cloudinary credentials', () => {
+      const status = getIntegrationStatus();
+      expect(typeof status.mongoConfigured).toBe('boolean');
+      expect(typeof status.geminiConfigured).toBe('boolean');
+      expect(typeof status.openaiConfigured).toBe('boolean');
+      expect(typeof status.googleOAuthConfigured).toBe('boolean');
+      expect(typeof status.cloudinaryConfigured).toBe('boolean');
+
+      const allCloudinaryPresent = Boolean(
+        ENV.CLOUDINARY_CLOUD_NAME && ENV.CLOUDINARY_API_KEY && ENV.CLOUDINARY_API_SECRET
+      );
+      expect(status.cloudinaryConfigured).toBe(allCloudinaryPresent);
     });
   });
 
