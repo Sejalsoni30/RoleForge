@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import { getDbStatus } from '../config/db';
 import { getAIConfigStatus } from '../services/ai';
-import { ENV } from '../config/env';
+import { ENV, getIntegrationStatus } from '../config/env';
 import { SystemStatusResponse } from '@roleforge/shared';
 
 export const getSystemStatus = (_req: Request, res: Response): void => {
   const dbStatus = getDbStatus();
   const aiStatus = getAIConfigStatus();
+  const integrations = getIntegrationStatus();
 
   const response: SystemStatusResponse = {
     healthy: dbStatus.connected,
@@ -28,8 +29,8 @@ export const getSystemStatus = (_req: Request, res: Response): void => {
       engine: 'tesseract.js',
     },
     fileStorage: {
-      configured: Boolean(ENV.CLOUDINARY_CLOUD_NAME),
-      driver: ENV.CLOUDINARY_CLOUD_NAME ? 'cloudinary' : 'local-disk',
+      configured: integrations.cloudinaryConfigured,
+      driver: integrations.cloudinaryConfigured ? 'cloudinary' : 'local-disk',
     },
   };
 

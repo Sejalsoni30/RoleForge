@@ -26,6 +26,9 @@ describe('RoleForge REST API Integration Tests', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.database.connected).toBe(true);
+    expect(res.body.data.fileStorage).toBeDefined();
+    expect(typeof res.body.data.fileStorage.configured).toBe('boolean');
+    expect(['local-disk', 'cloudinary']).toContain(res.body.data.fileStorage.driver);
   });
 
   it('POST /api/auth/register registers a new user with token', async () => {
