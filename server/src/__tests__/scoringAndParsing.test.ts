@@ -4,6 +4,8 @@ import { getIntegrationStatus, ENV } from '../config/env';
 import {
   RegisterSchema,
   LoginSchema,
+  ForgotPasswordSchema,
+  ResetPasswordSchema,
   ParsedResumeData,
   ParsedJobRequirements,
 } from '@roleforge/shared';
@@ -36,6 +38,31 @@ describe('RoleForge Semantic Compiler Engine Tests', () => {
         password: 'mypassword',
       };
       expect(() => LoginSchema.parse(valid)).not.toThrow();
+    });
+
+    it('validates forgot password schema and rejects invalid emails', () => {
+      expect(() => ForgotPasswordSchema.parse({ email: 'valid@example.com' })).not.toThrow();
+      expect(() => ForgotPasswordSchema.parse({ email: 'invalid-email' })).toThrow();
+    });
+
+    it('validates reset password schema with token and minimum password length', () => {
+      const valid = {
+        token: 'valid-reset-token-12345',
+        password: 'newSecurePassword123!',
+      };
+      expect(() => ResetPasswordSchema.parse(valid)).not.toThrow();
+
+      const invalidShortPassword = {
+        token: 'valid-reset-token-12345',
+        password: 'short',
+      };
+      expect(() => ResetPasswordSchema.parse(invalidShortPassword)).toThrow();
+
+      const missingToken = {
+        token: '',
+        password: 'newSecurePassword123!',
+      };
+      expect(() => ResetPasswordSchema.parse(missingToken)).toThrow();
     });
 
     it('accurately reports external integration readiness and requires complete Cloudinary credentials', () => {
